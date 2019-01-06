@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 使用嵌套Bean定义属性值 -->
+    <bean id="person" class="lrc.spring.ccb.injection.Person">
+        <property name="age" value="25"/>
+        <property name="pet">
+            <bean class="lrc.spring.ccb.injection.Pet">
+                <property name="barking" value="miao"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- 调用getter方法：使用PropertyPathFactoryBean -->
+    <bean id="person1" class="lrc.spring.ccb.injection.Person">
+        <property name="pet">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <!-- 确定目标Bean，指定son Bean来自哪个Bean的getter方法 -->
+                <property name="targetBeanName" value="person"/>
+                <!-- 指定son Bean来自目标Bean的哪个getter方法，age代表getAge() -->
+                <property name="propertyPath" value="pet"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- PropertyPathFactoryBean的一种简化写法 -->
+    <bean id="person2" class="lrc.spring.ccb.injection.Person">
+        <property name="pet">
+            <!-- 将person的pet属性赋给person2 -->
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean" id="person.pet"/>
+        </property>
+    </bean>
+
+    <!-- FieldRetrievingFactoryBean 类似于PropertyPathFactoryBean，它是对变量的操作 -->
+    <bean id="person3" class="lrc.spring.ccb.injection.Person">
+        <property name="age">
+            <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+                <!-- 静态变量 -->
+                <property name="targetClass" value="lrc.spring.ccb.injection.Obj"/>
+                <property name="targetField" value="NO_AGE"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- FieldRetrievingFactoryBean 简化写法 -->
+    <bean id="person4" class="lrc.spring.ccb.injection.Person">
+        <property name="age">
+            <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+                <property name="staticField" value="lrc.spring.ccb.injection.Obj.NO_AGE"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- MethodInvokingFactoryBean 方法操作 -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="lrc.spring.ccb.injection.Obj.SetBarking"/>
+        <property name="arguments" value="hahaha"/>
+    </bean>
+    <bean id="person5" class="lrc.spring.ccb.injection.Person">
+        <property name="age">
+            <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+                <property name="staticMethod" value="lrc.spring.ccb.injection.Obj.Get100Age"/>
+            </bean>
+        </property>
+        <property name="pet">
+            <bean class="lrc.spring.ccb.injection.Pet">
+                <property name="barking">
+                    <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+                        <property name="staticField" value="lrc.spring.ccb.injection.Obj.NO_BARKING"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+</beans>

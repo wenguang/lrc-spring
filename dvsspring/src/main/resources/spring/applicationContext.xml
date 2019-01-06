@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <context:component-scan base-package="jdkDynamicProxy,gclibAOP,dao"/>
+
+    <!-- AOP 相关配置 start -->
+
+    <bean name="source" class="pojo.Source">
+        <property name="fruit" value="葡萄"/>
+        <property name="sugar" value="无糖"/>
+        <property name="size" value="中杯"/>
+    </bean>
+    <bean name="juiceMaker" class="pojo.JuiceMaker">
+        <property name="source" ref="source" />
+    </bean>
+
+    <bean name="productService" class="service.ProductService" />
+
+    <bean id="userDao" class="jdkDynamicProxy.UserDao"/>
+    <bean id="aop" class="jdkDynamicProxy.AOP"/>
+    <bean id="proxyFactory" class="jdkDynamicProxy.ProxyFactory" factory-method="getProxyInstance">
+        <constructor-arg index="0" ref="userDao"></constructor-arg>
+        <constructor-arg index="1" ref="aop"></constructor-arg>
+    </bean>
+
+    <!-- 开启AOP注解方式 -->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+    <bean id="annotationDao" class="jdkDynamicProxy.AnnotationDao"/>
+    <bean id="orderDao" class="gclibAOP.OrderDao"/>
+
+    <!-- AOP 相关配置 end -->
+
+
+    <!-- DAO 相关配置 start -->
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/zheng?useSSL=false"/>
+        <property name="user" value="root"></property>
+        <property name="password" value="mj43420024"></property>
+        <property name="initialPoolSize" value="3"></property>
+        <property name="maxPoolSize" value="10"></property>
+        <property name="maxStatements" value="100"></property>
+        <property name="acquireIncrement" value="2"></property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="mjDao" class="dao.JdbcTemplateDao"/>
+
+    <!-- 事务管理类 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 引用数据连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 开启以注解方式实现事务控制 -->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <!-- DAO 相关配置 end -->
+
+</beans>

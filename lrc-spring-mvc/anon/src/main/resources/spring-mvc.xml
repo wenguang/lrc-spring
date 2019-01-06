@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+    <mvc:annotation-driven/>
+
+    <!-- 当user-default-filters=true时（默认为true）,
+    会扫描base-package包及其子包带有@Component、@Repository、@Service和@Controller的类,
+    当user-default-fitlers为false时,就可以指定扫描某种类型的类，
+    context:include-filter就是包含某个类型，
+    context:include-filter就是排队基个类型
+    参考：https://blog.csdn.net/chunqiuwei/article/details/16115135
+    -->
+    <context:component-scan base-package="anon" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- 参考：springMVC实现首页的重定向 https://blog.csdn.net/honghailiang888/article/details/52488980 -->
+    <mvc:view-controller path="/hello" view-name="redirect:/index"/>
+
+</beans>

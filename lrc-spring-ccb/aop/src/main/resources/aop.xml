@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <bean id="hello" class="lrc.spring.ccb.aop.Hello"/>
+    <bean id="helloAspect" class="lrc.spring.ccb.aop.HelloAspect"/>
+    <aop:config>
+        <!-- pointcut是拦截过滤规则对象，符合expression的过滤规则的就会被拦截 这是Hello类的所有方法-->
+        <!-- 这里过滤规则表达式是AspectJ表达式，即AspectJExpressionPointcut，除了它还有别的过滤规则表达式 -->
+        <!-- AspectJExpressionPointcut表达式的基本格式如下：-->
+        <!-- execution(<方法修饰符>? <方法返回值类型> <包名>.<类名>.<方法名>(<参数类型>) [throws <异常类型>]?) -->
+        <!-- 详细的规则参考：http://sishuok.com/forum/posts/list/281.html -->
+        <aop:pointcut id="helloPointcut" expression="execution(* lrc.spring.ccb.aop.Hello.*(..))"/>
+        <!-- aspect可以理解为一轮拦截，ref表示要引用哪个拦截器 -->
+        <aop:aspect ref="helloAspect">
+            <!-- pointcut-ref表示要拦截helloPointcut过滤规则筛选出的方法，method表示方法被拦截后执行拦截器的beforeAdvice -->
+            <!-- pointcut-ref也可以换为pointcut，直接写出过滤规则即行，那它就是一个匿名的过滤规则对象 -->
+            <aop:before pointcut-ref="helloPointcut" method="beforeAdvice"/>
+            <aop:around pointcut="execution(* lrc.spring.ccb.aop.Hello.*(..))" method="aroundAdvice"/>
+            <aop:after-returning pointcut-ref="helloPointcut" method="afterReturningAdvice" arg-names="retVal" returning="retVal"/>
+            <aop:after-throwing pointcut-ref="helloPointcut" method="afterThrowingAdvice" arg-names="ex" throwing="ex"/>
+            <aop:after pointcut-ref="helloPointcut" method="afterFinallyAdvice"/>
+        </aop:aspect>
+    </aop:config>
+
+</beans>

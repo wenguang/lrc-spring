@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <!-- 这句至关重要，它使得spring支持注解方式进行切面声明 -->
+    <aop:aspectj-autoproxy/>
+
+    <bean id="hello" class="lrc.spring.ccb.aop.Hello"/>
+    <bean id="annotationHelloAspect" class="lrc.spring.ccb.aop.AnnotationHelloAspect"/>
+
+</beans>

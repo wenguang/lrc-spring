@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- 这句至关重要，隐式地注册RequiredAnnotationBeanPostProcessor，使@Required注解生效 -->
+    <!-- 有了这句，运行时会检测@Required的属性是否在下面被赋值，若没被赋值就报异常 -->
+    <!-- 若注释掉这句，即便下面配置中没有给@Required的属性赋值，运行也不会报异常-->
+    <context:annotation-config/>
+    <!-- 下面这句也可以实现一样的功能 -->
+    <!--<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>-->
+
+    <bean id="message" class="java.lang.String">
+        <constructor-arg index="0" value="hello"/>
+    </bean>
+    <bean id="result" class="lrc.spring.ccb.annotation.Result">
+        <property name="code" value="200"/>
+        <property name="message" ref="message"/>
+    </bean>
+
+
+    <!-- 这句至关重要，它让@Autowired生效 -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+    <!-- @Autowired让代码不用写getter，setter，也让moo不会配置property了，运行时会在配置中找到相关的bean填充进去 -->
+    <bean id="moo" class="lrc.spring.ccb.annotation.Moo"/>
+
+    <!-- 既然moo不用配置property，那我要是配置了car，怎么办呢？-->
+    <!-- 实验得到若只配置一个car，id取什么名字都可以，若配置多个car，得有其中一个id的名字为car，不然无法识别 -->
+    <bean id="car" class="lrc.spring.ccb.annotation.Car">
+        <property name="brand" value="suziki"/>
+    </bean>
+
+    <bean id="fun" class="lrc.spring.ccb.annotation.Fun">
+        <property name="number" value="0"/>
+    </bean>
+
+
+    <!-- 配置PropertiesFactoryBean才能让@Value引入属性文件中的值 -->
+    <bean id="valueProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location" value="value.properties"/>
+    </bean>
+    <bean id="carsProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location" value="cars.properties"/>
+    </bean>
+
+    <bean id="obj" class="lrc.spring.ccb.annotation.Obj"/>
+    <bean id="obj2" class="lrc.spring.ccb.annotation.Obj2"/>
+
+</beans>
